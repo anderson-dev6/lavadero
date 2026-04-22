@@ -15,8 +15,10 @@ Car-Wash Cereté — Supabase
 3) Authentication → Providers: habilita Email. Para desarrollo puedes desactivar
    "Confirm email" para entrar al instante tras registrarse.
 
-4) Authentication → URL configuration: añade http://localhost:5173 (y tu dominio
-   de producción) en Redirect URLs.
+4) Authentication → URL configuration:
+   - Site URL: https://lavadero-git-main-andresitosuarezsoto06-3596s-projects.vercel.app
+   - Redirect URLs: http://localhost:5173/** y la misma URL de Vercel con /** al
+     final (y cualquier otro *.vercel.app que uses).
 
 5) Usuarios y roles (profiles.role = admin | empleado | cliente):
    - Los clientes que se registran desde la app quedan como "cliente".

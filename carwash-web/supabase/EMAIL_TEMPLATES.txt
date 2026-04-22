@@ -24,9 +24,19 @@ Pasos en Supabase (panel web)
    - **Body**: pega el contenido completo de **restablecer-contrasena.html**.
    - Guarda.
 
-4. En **Authentication** → **URL configuration**, asegúrate de tener en
-   **Redirect URLs** la URL de tu app (ej. http://localhost:5173 y tu dominio de
-   producción), para que el enlace del correo redirija bien.
+4. En **Authentication** → **URL configuration** (esto define el enlace real de
+   {{ .ConfirmationURL }} en los correos; las plantillas HTML no llevan el dominio):
+
+   - **Site URL** (URL “oficial” de la app):  
+     https://lavadero-git-main-andresitosuarezsoto06-3596s-projects.vercel.app  
+     (sin barra al final. Si cambias el dominio en Vercel, actualiza aquí.)
+
+   - **Redirect URLs** (lista blanca): añade como mínimo:
+     - http://localhost:5173/**
+     - https://lavadero-git-main-andresitosuarezsoto06-3596s-projects.vercel.app/**
+     Si Vercel te muestra otro dominio corto (ej. `*.vercel.app`), añádelo también
+     con el mismo formato `/**` para que la verificación y el reset de contraseña
+     no den error.
 
 Variables que usa Supabase (no las borres)
 ------------------------------------------

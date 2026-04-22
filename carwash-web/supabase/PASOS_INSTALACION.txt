@@ -60,6 +60,23 @@ Si al registrarte como cliente aparece **Email not confirmed** al iniciar sesió
    → **Email** → desactivar **«Confirm email»**: así no hace falta confirmar y
    puedes entrar en cuanto registras.
 
+PASO 5b — Producción Vercel: que el enlace del correo de verificación funcione
+-----------------------------------------------------------------------------
+Supabase arma el enlace del correo con **Site URL** y solo permite redirigir a URLs
+listadas en **Redirect URLs**. Sin esto, el clic en “confirmar” puede fallar.
+
+1. Supabase → **Authentication** → **URL configuration**.
+2. **Site URL**:  
+   https://lavadero-git-main-andresitosuarezsoto06-3596s-projects.vercel.app  
+   (sin `/` final; si cambias de dominio en Vercel, vuelve aquí y actualízalo.)
+3. **Redirect URLs**, añade:
+   - http://localhost:5173/**
+   - https://lavadero-git-main-andresitosuarezsoto06-3596s-projects.vercel.app/**
+   Si usas otro dominio de Vercel (dominio corto tipo `lavadero-xxx.vercel.app`),
+   añádelo también en una línea con `/**`.
+4. Guarda. Para probar de nuevo, usa **Reenviar correo de confirmación** en el login
+   (los enlaces viejos pueden seguir apuntando a la URL anterior hasta que caduquen).
+
 PASO 6 — Probar la app (admin)
 ----------------------
 1. En tu PC: archivo **.env** del front con **VITE_SUPABASE_URL** y

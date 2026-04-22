@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 import { useReservas } from '../../context/ReservasContext'
+import { ClientePageHeader } from '../../components/cliente/ClientePageHeader'
 import { hoyISO } from '../../lib/dates'
 import { horasDisponiblesParaFecha } from '../../lib/agendaSlots'
 import { labelReservaEstado, labelServicio, labelVehiculo } from '../../lib/labels'
@@ -27,14 +28,15 @@ export function ClienteReservas() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Mis reservas</h1>
-        <p className="text-slate-600">Cancelar o reprogramar (RF-02).</p>
-      </div>
+    <div className="space-y-8">
+      <ClientePageHeader
+        title="Mis reservas"
+        subtitle="Consulta el estado, cancela o reprograma cuando lo necesites."
+      />
 
-      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="font-semibold text-slate-800">Reprogramar (elegir nueva franja)</h2>
+      <section className="animate-client-fade-up animate-client-delay-1 rounded-2xl border border-violet-100/90 bg-white/95 p-5 shadow-xl shadow-violet-100/40 backdrop-blur-sm">
+        <h2 className="font-bold text-slate-900">Reprogramar</h2>
+        <p className="mt-0.5 text-sm text-slate-500">Elige nueva fecha y hora disponibles.</p>
         <div className="mt-3 flex flex-wrap gap-2">
           <input
             type="date"
@@ -44,14 +46,14 @@ export function ClienteReservas() {
               setFechaRep(e.target.value)
               setHoraRep('')
             }}
-            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+            className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           />
           <select
             value={horaRep === '' ? '' : String(horaRep)}
             onChange={(e) =>
               setHoraRep(e.target.value ? Number(e.target.value) : '')
             }
-            className="rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+            className="rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-sm transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="">Hora</option>
             {horasLibres.map((h) => (
@@ -66,13 +68,13 @@ export function ClienteReservas() {
         </p>
       </section>
 
-      <ul className="space-y-3">
+      <ul className="space-y-4">
         {mias
           .sort((a, b) => b.fechaHora.localeCompare(a.fechaHora))
           .map((r) => (
             <li
               key={r.id}
-              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+              className="animate-client-fade-up rounded-2xl border border-slate-100 bg-white/95 p-5 shadow-lg shadow-slate-200/40 transition hover:border-violet-100 hover:shadow-violet-100/50"
             >
               <p className="font-medium text-slate-900">
                 {new Date(r.fechaHora).toLocaleString('es-CO')}
@@ -90,7 +92,7 @@ export function ClienteReservas() {
                     <button
                       type="button"
                       onClick={() => void cancelar(r.id)}
-                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-800 hover:bg-red-100"
+                      className="rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-800 transition hover:bg-red-100 active:scale-[0.98]"
                     >
                       Cancelar
                     </button>
@@ -98,7 +100,7 @@ export function ClienteReservas() {
                       type="button"
                       onClick={() => void aplicarReprogramar(r.id)}
                       disabled={horaRep === ''}
-                      className="rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50"
+                      className="rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-violet-500/20 transition hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-45"
                     >
                       Aplicar reprogramación
                     </button>

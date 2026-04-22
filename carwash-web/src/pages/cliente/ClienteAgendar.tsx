@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useReservas } from '../../context/ReservasContext'
+import { ClientePageHeader } from '../../components/cliente/ClientePageHeader'
 import { hoyISO } from '../../lib/dates'
 import { horasDisponiblesParaFecha } from '../../lib/agendaSlots'
 import type { ServiceType, VehicleType } from '../../types/carwash'
@@ -49,17 +50,15 @@ export function ClienteAgendar() {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-800">Agendar turno</h1>
-        <p className="text-slate-600">
-          Horarios según capacidad (3 vehículos por hora, 8:00–17:00).
-        </p>
-      </div>
+    <div className="space-y-8">
+      <ClientePageHeader
+        title="Agendar turno"
+        subtitle="Horarios según capacidad: hasta 3 vehículos por hora, franja 8:00–17:00."
+      />
 
       <form
         onSubmit={enviar}
-        className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        className="animate-client-fade-up animate-client-delay-1 space-y-5 rounded-2xl border border-violet-100/90 bg-white/95 p-5 shadow-xl shadow-violet-100/50 backdrop-blur-sm sm:p-6"
       >
         <label className="block text-sm">
           <span className="font-medium text-slate-700">Fecha</span>
@@ -72,7 +71,7 @@ export function ClienteAgendar() {
               setFecha(e.target.value)
               setHora('')
             }}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           />
         </label>
 
@@ -84,7 +83,7 @@ export function ClienteAgendar() {
             onChange={(e) =>
               setHora(e.target.value ? Number(e.target.value) : '')
             }
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="">Elige hora</option>
             {horasLibres.map((h) => (
@@ -106,7 +105,7 @@ export function ClienteAgendar() {
             required
             value={placa}
             onChange={(e) => setPlaca(e.target.value.toUpperCase())}
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           />
         </label>
 
@@ -117,7 +116,7 @@ export function ClienteAgendar() {
             onChange={(e) =>
               setTipoVehiculo(e.target.value as VehicleType)
             }
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="carro">Carro</option>
             <option value="moto">Moto</option>
@@ -132,7 +131,7 @@ export function ClienteAgendar() {
             onChange={(e) =>
               setTipoServicio(e.target.value as ServiceType)
             }
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2.5 transition focus:border-violet-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-400/30"
           >
             <option value="basico">Básico</option>
             <option value="completo">Completo</option>
@@ -142,21 +141,27 @@ export function ClienteAgendar() {
         </label>
 
         {okMsg ? (
-          <p className="rounded-lg bg-emerald-50 p-3 text-sm text-emerald-900">
+          <p className="animate-client-fade-in rounded-xl border border-emerald-200 bg-emerald-50/90 p-4 text-sm text-emerald-900 shadow-sm">
             {okMsg}
           </p>
         ) : null}
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-violet-600 py-2.5 font-semibold text-white hover:bg-violet-700"
+          className="w-full rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 py-3 font-semibold text-white shadow-lg shadow-violet-500/25 transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-violet-500/30 active:translate-y-0"
         >
           Solicitar turno
         </button>
       </form>
 
-      <Link to="/cliente/reservas" className="text-sm font-medium text-violet-700 underline">
+      <Link
+        to="/cliente/reservas"
+        className="animate-client-fade-up animate-client-delay-2 inline-flex items-center text-sm font-semibold text-violet-700 transition hover:text-violet-900"
+      >
         Ver mis reservas
+        <span aria-hidden className="ml-1">
+          →
+        </span>
       </Link>
     </div>
   )
