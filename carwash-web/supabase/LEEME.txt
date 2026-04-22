@@ -1,0 +1,34 @@
+Car-Wash Cereté — Supabase
+==========================
+
+1) En el proyecto carwash-web, copia .env.example a .env y revisa:
+   VITE_SUPABASE_URL
+   VITE_SUPABASE_ANON_KEY   (clave "anon" / publishable del panel de Supabase)
+
+   En Vite NO uses NEXT_PUBLIC_; las variables deben empezar por VITE_.
+
+2) Base de datos en Supabase: usa el archivo **instalacion_completa.sql**
+   (recomendado). Guía paso a paso: **PASOS_INSTALACION.txt**.
+   El archivo **schema.sql** queda como referencia antigua; si empiezas de cero,
+   usa instalacion_completa.sql.
+
+3) Authentication → Providers: habilita Email. Para desarrollo puedes desactivar
+   "Confirm email" para entrar al instante tras registrarse.
+
+4) Authentication → URL configuration: añade http://localhost:5173 (y tu dominio
+   de producción) en Redirect URLs.
+
+5) Usuarios y roles (profiles.role = admin | empleado | cliente):
+   - Los clientes que se registran desde la app quedan como "cliente".
+   - Para un administrador: crea el usuario en Authentication → Users (Add user),
+     luego en Table Editor abre "profiles", localiza la fila con ese user id y
+     pon role = admin (y el nombre que quieras).
+   - Igual para empleado: role = empleado y nombre que coincida con el que uses
+     al asignar servicios (ej. "Empleado" si usas el empleado por defecto del seed).
+
+6) Recuperación de contraseña: configura la plantilla de email en Supabase y la
+   URL de redirección (Auth → Email templates).
+
+7) Seguridad: las políticas RLS actuales permiten a cualquier usuario autenticado
+   leer/escribir en las tablas de negocio. Para producción, endurece las políticas
+   por rol.

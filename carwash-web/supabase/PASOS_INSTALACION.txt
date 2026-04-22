@@ -1,0 +1,90 @@
+Car-Wash Cereté — Pasos en Supabase (admin y base de datos)
+===========================================================
+
+PASO 1 — Abrir el proyecto
+--------------------------
+Entra en https://supabase.com → tu proyecto (el que usa la URL de tu .env).
+
+
+PASO 2 — Ejecutar el SQL completo (primera vez)
+-----------------------------------------------
+1. Menú izquierdo: **SQL Editor**.
+2. **New query**.
+3. Abre el archivo **instalacion_completa.sql** del proyecto (carpeta supabase).
+4. Copia **todo** el contenido y pégalo en el editor.
+5. Antes de dar **Run**, baja hasta el final del script y revisa la parte 5:
+   - Por defecto está el correo **admin@carwash.local**.
+   - Si vas a crear el administrador con **otro** correo, cambia esa línea entre
+     comillas simples para que coincida EXACTAMENTE con el correo que usarás.
+6. Pulsa **Run** (o Ctrl+Enter).
+
+Si algo falla, copia el mensaje de error (suele ser por ejecutar dos veces el
+trigger o tablas ya creadas; el script está pensado para ser repetible en gran
+parte).
+
+
+PASO 3 — Crear el usuario administrador en Authentication
+-----------------------------------------------------------
+El SQL **no puede inventar** la contraseña del admin en la nube de forma segura;
+por eso el usuario se crea aquí:
+
+1. Ve a **Authentication** → **Users**.
+2. **Add user** → **Create new user**.
+3. Email: por ejemplo **admin@carwash.local** (el mismo que pusiste en el UPDATE
+   del final del SQL, parte 5).
+4. Contraseña: la que quieras (guárdala bien).
+5. Opcional: desactiva **“Confirm email”** en **Authentication** → **Providers**
+   → **Email** si quieres entrar sin confirmar correo (solo para pruebas).
+
+
+PASO 4 — Si el UPDATE del SQL dio 0 filas (no era admin)
+---------------------------------------------------------
+Ocurre si ejecutaste el SQL **antes** de crear el usuario en Authentication.
+
+Opción A — Vuelve a ejecutar solo el bloque UPDATE del final de
+**instalacion_completa.sql** (parte 5), con el correo correcto.
+
+Opción B — Manual: **Table Editor** → tabla **profiles** → localiza la fila cuyo
+**id** sea el mismo UUID que tu usuario en Authentication → cambia **role** a
+**admin**.
+
+
+PASO 5 — Clientes y «Email not confirmed»
+-----------------------------------------
+Si al registrarte como cliente aparece **Email not confirmed** al iniciar sesión:
+
+1. Revisa tu correo (y spam): debe llegar un email de Supabase con un **enlace**.
+   Ábrelo para confirmar la cuenta y luego entra de nuevo en la app.
+2. En la pantalla de login puedes usar **«Reenviar correo de confirmación»**.
+3. Solo para desarrollo/pruebas: Supabase → **Authentication** → **Providers**
+   → **Email** → desactivar **«Confirm email»**: así no hace falta confirmar y
+   puedes entrar en cuanto registras.
+
+PASO 6 — Probar la app (admin)
+----------------------
+1. En tu PC: archivo **.env** del front con **VITE_SUPABASE_URL** y
+   **VITE_SUPABASE_ANON_KEY**.
+2. **npm run dev** en la carpeta **carwash-web**.
+3. **Iniciar sesión** con el correo y contraseña del administrador.
+4. Debes entrar al panel **/admin**.
+
+
+Usuario empleado (opcional)
+---------------------------
+1. Crea otro usuario en **Authentication** (ej. empleado@carwash.local).
+2. En **profiles**, pon **role** = **empleado** y **nombre** = **Empleado** para
+   que coincida con el empleado por defecto del sistema al asignar servicios.
+
+O ejecuta en SQL Editor (ajusta el correo):
+
+  update public.profiles
+  set role = 'empleado', nombre = 'Empleado', updated_at = now()
+  where id = (select id from auth.users where email = 'empleado@carwash.local' limit 1);
+
+
+Notas
+-----
+- El archivo **schema.sql** antiguo es un subconjunto; usa **instalacion_completa.sql**
+  como referencia única si empiezas de cero.
+- Para producción, endurece las políticas RLS (no “todo permitido” a cualquier
+  usuario autenticado).

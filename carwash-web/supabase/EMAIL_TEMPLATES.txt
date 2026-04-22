@@ -1,0 +1,46 @@
+Plantillas de correo profesionales — Car-Wash Cereté
+=====================================================
+
+Archivos en esta carpeta:
+
+  email-templates/confirmar-registro.html     → Confirmación al registrarse
+  email-templates/restablecer-contrasena.html → Recuperar contraseña
+
+Pasos en Supabase (panel web)
+------------------------------
+
+1. Entra a tu proyecto → **Authentication** → **Email Templates**.
+
+2. **Confirm sign up**
+   - **Subject**: por ejemplo  
+     Confirma tu cuenta · Car-Wash Cereté
+   - **Body**: abre **confirmar-registro.html**, selecciona TODO el contenido
+     (Ctrl+A), cópialo y pégalo en el editor de plantilla de Supabase.
+   - Guarda.
+
+3. **Reset password** (opcional pero recomendado para el mismo estilo)
+   - **Subject**: por ejemplo  
+     Restablecer contraseña · Car-Wash Cereté
+   - **Body**: pega el contenido completo de **restablecer-contrasena.html**.
+   - Guarda.
+
+4. En **Authentication** → **URL configuration**, asegúrate de tener en
+   **Redirect URLs** la URL de tu app (ej. http://localhost:5173 y tu dominio de
+   producción), para que el enlace del correo redirija bien.
+
+Variables que usa Supabase (no las borres)
+------------------------------------------
+
+  {{ .ConfirmationURL }}  → enlace único de confirmación o recuperación
+  {{ .Email }}            → correo del usuario
+
+Notas
+-----
+
+- Si el editor de Supabase solo acepta HTML “sin” <!DOCTYPE>, prueba pegando
+  desde la primera etiqueta <table ...> hasta el cierre del último </table>
+  del archivo; si algo falla, usa el archivo completo primero.
+- Los estilos van en línea (inline) para que Gmail y Outlook móvil los respeten
+  mejor.
+- El icono del coche es un emoji (&#128663;); si no se ve en algún cliente,
+  puedes sustituirlo por texto “CW” o una imagen hospedada en URL pública.
