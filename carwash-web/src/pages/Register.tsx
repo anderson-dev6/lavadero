@@ -3,31 +3,46 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export function Register() {
-  const { registerCliente } = useAuth()
   const navigate = useNavigate()
+  const { loginTelefono, verificarCodigoOTP } = useAuth()
   const [nombre, setNombre] = useState('')
+  const [codigoPais, setCodigoPais] = useState('+57')
   const [telefono, setTelefono] = useState('')
-  const [correo, setCorreo] = useState('')
-  const [contrasena, setContrasena] = useState('')
+  const [codigo, setCodigo] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [codigoEnviado, setCodigoEnviado] = useState(false)
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleEnviarCodigo(e: FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (!nombre.trim() || !telefono.trim()) {
+      setError('Nombre y teléfono son obligatorios')
+      return
+    }
+    setLoading(true)
+    const telefonoCompleto = codigoPais + telefono.trim().replace(/\D/g, '')
+    const result = await loginTelefono(telefonoCompleto)
+    if (result.ok) {
+      setCodigoEnviado(true)
+    } else {
+      setError(result.message)
+    }
+    setLoading(false)
+  }
+
+  async function handleVerificar(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setLoading(true)
-    const r = await registerCliente({
-      nombre,
-      telefono,
-      correo,
-      contrasena,
-    })
-    setLoading(false)
-    if (!r.ok) {
-      setError(r.message)
-      return
+    const telefonoCompleto = codigoPais + telefono.trim().replace(/\D/g, '')
+    const result = await verificarCodigoOTP(telefonoCompleto, codigo.trim(), nombre.trim())
+    if (result.ok) {
+      navigate('/cliente')
+    } else {
+      setError(result.message)
     }
-    navigate('/login', { replace: true, state: { registered: true } })
+    setLoading(false)
   }
 
   return (
@@ -56,67 +71,101 @@ export function Register() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5">
-          <label className="block text-left text-sm">
-            <span className="mb-1.5 block font-medium text-slate-300">Nombre completo</span>
-            <input
-              required
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
-              placeholder="Ej. María López"
+        {!codigoEnviado ? (
+          <form onSubmit={handleEnviarCodigo} className="mt-8 space-y-5">
+            <label className="block text-left text-sm">
+              <span className="mb-1.5 block font-medium text-slate-300">Nombre completo</span>
+              <input
+                required
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+                placeholder="Ej. María López"
+                disabled={loading}
+              />
+            </label>
+            <label className="block text-left text-sm">
+              <span className="mb-1.5 block font-medium text-slate-300">Teléfono</span>
+              <div className="flex gap-2">
+                <select
+                  value={codigoPais}
+                  onChange={(e) => setCodigoPais(e.target.value)}
+                  disabled={loading}
+                  className="rounded-xl border border-white/10 bg-[#161b22] px-2 py-3 text-[15px] text-white focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+                >
+                  <option value="+57">+57</option>
+                  <option value="+1">+1</option>
+                  <option value="+34">+34</option>
+                  <option value="+44">+44</option>
+                  <option value="+33">+33</option>
+                  <option value="+49">+49</option>
+                  <option value="+39">+39</option>
+                  <option value="+52">+52</option>
+                  <option value="+55">+55</option>
+                  <option value="+56">+56</option>
+                </select>
+                <input
+                  type="tel"
+                  required
+                  value={telefono}
+                  onChange={(e) => setTelefono(e.target.value)}
+                  className="flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+                  placeholder="Ej. 300 123 4567"
+                  disabled={loading}
+                />
+              </div>
+            </label>
+            {error ? (
+              <p className="rounded-lg bg-red-500/10 px-3 py-2 text-center text-sm text-red-200" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <button
+              type="submit"
               disabled={loading}
-            />
-          </label>
-          <label className="block text-left text-sm">
-            <span className="mb-1.5 block font-medium text-slate-300">Teléfono</span>
-            <input
-              required
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
-              placeholder="Ej. 300 123 4567"
-              disabled={loading}
-            />
-          </label>
-          <label className="block text-left text-sm">
-            <span className="mb-1.5 block font-medium text-slate-300">Correo electrónico</span>
-            <input
-              type="email"
-              required
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
-              placeholder="nombre@ejemplo.com"
-              disabled={loading}
-            />
-          </label>
-          <label className="block text-left text-sm">
-            <span className="mb-1.5 block font-medium text-slate-300">Contraseña</span>
-            <input
-              type="password"
-              required
-              value={contrasena}
-              onChange={(e) => setContrasena(e.target.value)}
-              className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
-              placeholder="Mínimo 6 caracteres"
-              disabled={loading}
-              minLength={6}
-            />
-          </label>
-          {error ? (
-            <p className="rounded-lg bg-red-500/10 px-3 py-2 text-center text-sm text-red-200" role="alert">
-              {error}
-            </p>
-          ) : null}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:from-sky-400 hover:to-sky-500 disabled:opacity-55"
-          >
-            {loading ? 'Creando cuenta…' : 'Crear mi cuenta'}
-          </button>
-        </form>
+              className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:from-sky-400 hover:to-sky-500 disabled:opacity-55"
+            >
+              {loading ? 'Enviando código…' : 'Crear mi cuenta'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerificar} className="mt-8 space-y-5">
+            <div className="rounded-lg bg-sky-500/10 px-3 py-2 text-center text-sm text-sky-200">
+              Código enviado a {codigoPais}{telefono}
+            </div>
+            <label className="block text-left text-sm">
+              <span className="mb-1.5 block font-medium text-slate-300">Código (6 dígitos)</span>
+              <input
+                type="text"
+                placeholder="000000"
+                maxLength={6}
+                required
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ''))}
+                className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-center text-2xl font-bold letter-spacing-2 text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+              />
+            </label>
+            {error ? (
+              <p className="rounded-lg bg-red-500/10 px-3 py-2 text-center text-sm text-red-200" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <button
+              type="submit"
+              disabled={loading || codigo.length !== 6}
+              className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:from-sky-400 hover:to-sky-500 disabled:opacity-55"
+            >
+              {loading ? 'Verificando…' : 'Verificar y entrar'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setCodigoEnviado(false)}
+              className="w-full rounded-xl border border-white/10 py-3.5 text-[15px] font-semibold text-sky-400 transition hover:border-sky-500/50"
+            >
+              Cambiar teléfono
+            </button>
+          </form>
+        )}
 
         <p className="mt-6 border-t border-white/[0.06] pt-6 text-center text-sm text-slate-500">
           ¿Ya tienes cuenta?{' '}

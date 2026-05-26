@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { supabase } from '../lib/supabase/client'
 import { esCorreoNoConfirmado, mensajeErrorLogin } from '../lib/supabase/authMessages'
+import { solicitarCodigoOTP, verificarCodigoOTP } from '../lib/otpApi'
 import type { UserRole } from '../types/carwash'
 
 export type User = {
@@ -39,6 +40,14 @@ type AuthState = {
     | { ok: true }
     | { ok: false; message: string; needsEmailConfirmation?: boolean }
   >
+  loginTelefono: (
+    telefono: string,
+  ) => Promise<{ ok: true } | { ok: false; message: string }>
+  verificarCodigoOTP: (
+    telefono: string,
+    codigo: string,
+    nombre?: string,
+  ) => Promise<{ ok: true } | { ok: false; message: string }>
   registerCliente: (
     data: RegistroClienteInput,
   ) => Promise<{ ok: true } | { ok: false; message: string }>
@@ -170,6 +179,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { ok: true as const }
   }, [hydrate])
 
+  const loginTelefono = useCallback(async (telefono: string) => {
+    if (!telefono.trim()) {
+      return { ok: false as const, message: 'Ingresa tu teléfono.' }
+    }
+    const result = await solicitarCodigoOTP(telefono.trim())
+    return result
+  }, [])
+
+  const verificarCodigoOTPHandler = useCallback(async (telefono: string, codigo: string, nombre?: string) => {
+    if (!telefono.trim() || !codigo.trim()) {
+      return { ok: false as const, message: 'Completa los datos.' }
+    }
+    const result = await verificarCodigoOTP(telefono.trim(), codigo.trim(), nombre)
+    if (result.ok && result.access_token && result.refresh_token) {
+      // Establecer sesión con tokens del servidor
+      const { data, error } = await supabase.auth.setSession({
+        access_token: result.access_token,
+        refresh_token: result.refresh_token,
+      })
+      if (!error && data.user) {
+        await hydrate(data.user)
+      } else {
+        console.error('Error setSession:', error)
+      }
+    }
+    return result
+  }, [hydrate])
+
   const registerCliente = useCallback(
     async (data: RegistroClienteInput) => {
       const email = data.correo.trim().toLowerCase()
@@ -239,8 +276,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [refreshUser])
 
   const value = useMemo(
-    () => ({ user, authReady, refreshUser, login, registerCliente, logout }),
-    [user, authReady, refreshUser, login, registerCliente, logout],
+    () => ({ user, authReady, refreshUser, login, loginTelefono, verificarCodigoOTP: verificarCodigoOTPHandler, registerCliente, logout }),
+    [user, authReady, refreshUser, login, loginTelefono, verificarCodigoOTPHandler, registerCliente, logout],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

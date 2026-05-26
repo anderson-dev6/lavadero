@@ -3,9 +3,34 @@ import { hoyISO } from '../../lib/dates'
 import { labelReservaEstado, labelServicio, labelVehiculo } from '../../lib/labels'
 import type { Reserva, ReservaEstado } from '../../types/carwash'
 
+const API_BASE = import.meta.env.DEV ? 'http://localhost:3001' : import.meta.env.VITE_API_URL || ''
+
+async function notificarWhatsApp(reserva: Reserva) {
+  try {
+    await fetch(`${API_BASE}/api/whatsapp/reserva-confirmada`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clienteEmail: reserva.clienteEmail,
+        fechaHora: reserva.fechaHora,
+        tipoServicio: reserva.tipoServicio,
+        tipoVehiculo: reserva.tipoVehiculo,
+        placa: reserva.placa,
+      }),
+    })
+  } catch (err) {
+    console.error('Error al notificar WhatsApp:', err)
+  }
+}
+
 export function AdminReservas() {
   const { reservas, cambiarEstado } = useReservas()
   const hoy = hoyISO()
+
+  async function handleConfirmar(reserva: Reserva) {
+    await cambiarEstado(reserva.id, 'confirmada')
+    void notificarWhatsApp(reserva)
+  }
 
   const ordenadas = [...reservas].sort((a, b) =>
     a.fechaHora.localeCompare(b.fechaHora),
@@ -31,6 +56,7 @@ export function AdminReservas() {
         <ListaReservas
           items={delDia}
           onCambiar={cambiarEstado}
+          onConfirmar={handleConfirmar}
           vacio="No hay reservas para hoy."
         />
       </section>
@@ -40,6 +66,7 @@ export function AdminReservas() {
         <ListaReservas
           items={ordenadas}
           onCambiar={cambiarEstado}
+          onConfirmar={handleConfirmar}
           vacio="Aún no hay reservas."
         />
       </section>
@@ -50,10 +77,12 @@ export function AdminReservas() {
 function ListaReservas({
   items,
   onCambiar,
+  onConfirmar,
   vacio,
 }: {
   items: Reserva[]
   onCambiar: (id: string, e: ReservaEstado) => void | Promise<void>
+  onConfirmar: (r: Reserva) => void | Promise<void>
   vacio: string
 }) {
   if (items.length === 0) {
@@ -98,7 +127,7 @@ function ListaReservas({
                 <button
                   type="button"
                   className="rounded-lg bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-700"
-                  onClick={() => void onCambiar(r.id, 'confirmada')}
+                  onClick={() => void onConfirmar(r)}
                 >
                   Confirmar
                 </button>

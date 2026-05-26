@@ -5,26 +5,36 @@ import { rutaPorRol } from '../lib/routes'
 import { supabase } from '../lib/supabase/client'
 
 export function Login() {
-  const { login, user } = useAuth()
+  const { login, loginTelefono, verificarCodigoOTP, user } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: { pathname: string } })?.from
-    ?.pathname
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname
   const registered = (location.state as { registered?: boolean })?.registered
 
+  const [tipo, setTipo] = useState<'admin' | 'cliente'>('admin')
+
+  // Admin
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
   const [needsConfirm, setNeedsConfirm] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [resendLoading, setResendLoading] = useState(false)
   const [resendOk, setResendOk] = useState<string | null>(null)
+
+  // Cliente
+  const [codigoPais, setCodigoPais] = useState('+57')
+  const [telefono, setTelefono] = useState('')
+  const [codigo, setCodigo] = useState('')
+  const [codigoEnviado, setCodigoEnviado] = useState(false)
+
+  // General
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (user) navigate(from || rutaPorRol(user.role), { replace: true })
   }, [user, from, navigate])
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleAdmin(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setNeedsConfirm(false)
@@ -37,6 +47,42 @@ export function Login() {
       setNeedsConfirm(Boolean(result.needsEmailConfirmation))
       return
     }
+  }
+
+  async function handleClienteEnviar(e: FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (!telefono.trim()) {
+      setError('Teléfono requerido')
+      return
+    }
+    setLoading(true)
+    const telefonoCompleto = codigoPais + telefono.trim().replace(/\D/g, '')
+    const result = await loginTelefono(telefonoCompleto)
+    if (result.ok) {
+      setCodigoEnviado(true)
+    } else {
+      setError(result.message)
+    }
+    setLoading(false)
+  }
+
+  async function handleClienteVerificar(e: FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (!codigo.trim() || codigo.length !== 6) {
+      setError('Código debe tener 6 dígitos')
+      return
+    }
+    setLoading(true)
+    const telefonoCompleto = codigoPais + telefono.trim().replace(/\D/g, '')
+    const result = await verificarCodigoOTP(telefonoCompleto, codigo.trim())
+    if (result.ok) {
+      navigate('/cliente')
+    } else {
+      setError(result.message)
+    }
+    setLoading(false)
   }
 
   async function reenviarConfirmacion() {
@@ -95,24 +141,43 @@ export function Login() {
             Iniciar sesión
           </h1>
           <p className="mt-1 text-sm font-medium text-sky-100/90">Car-Wash Cereté</p>
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-400">
-            Introduce el correo y la contraseña que usa tu cuenta. Serás dirigido a
-            tu espacio de trabajo automáticamente.
-          </p>
         </div>
 
-        {registered ? (
-          <div
-            className="mt-6 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-4 py-3 text-center text-sm text-emerald-100"
-            role="status"
+        <div className="mt-6 flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setTipo('admin')
+              setError(null)
+              setCodigoEnviado(false)
+            }}
+            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition ${
+              tipo === 'admin'
+                ? 'bg-sky-500 text-white'
+                : 'border border-white/10 text-slate-400 hover:text-white'
+            }`}
           >
-            Cuenta creada. Si no entras al primer intento, puede que falte
-            <strong className="font-semibold text-emerald-50"> confirmar el correo</strong>: mira tu
-            bandeja (y spam) y abre el enlace de verificación antes de iniciar sesión.
-          </div>
-        ) : null}
+            Admin
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setTipo('cliente')
+              setError(null)
+              setCodigoEnviado(false)
+            }}
+            className={`flex-1 rounded-lg py-2 text-sm font-semibold transition ${
+              tipo === 'cliente'
+                ? 'bg-sky-500 text-white'
+                : 'border border-white/10 text-slate-400 hover:text-white'
+            }`}
+          >
+            Cliente
+          </button>
+        </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
+        {tipo === 'admin' ? (
+          <form onSubmit={handleAdmin} className="mt-8 space-y-5" noValidate>
           <label className="block text-left text-sm">
             <span className="mb-1.5 block font-medium text-slate-300">Correo electrónico</span>
             <input
@@ -164,31 +229,133 @@ export function Login() {
               ) : null}
             </div>
           ) : null}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:from-sky-400 hover:to-sky-500 disabled:opacity-55"
-          >
-            {loading ? 'Accediendo…' : 'Iniciar sesión'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:from-sky-400 hover:to-sky-500 disabled:opacity-55"
+            >
+              {loading ? 'Accediendo…' : 'Iniciar sesión'}
+            </button>
+          </form>
+        ) : (
+          <>
+            {!codigoEnviado ? (
+              <form onSubmit={handleClienteEnviar} className="mt-8 space-y-5">
+                <label className="block text-left text-sm">
+                  <span className="mb-1.5 block font-medium text-slate-300">Teléfono</span>
+                  <div className="flex gap-2">
+                    <select
+                      value={codigoPais}
+                      onChange={(e) => setCodigoPais(e.target.value)}
+                      disabled={loading}
+                      className="rounded-xl border border-white/10 bg-[#161b22] px-2 py-3 text-[15px] text-white focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+                    >
+                      <option value="+57">+57</option>
+                      <option value="+1">+1</option>
+                      <option value="+34">+34</option>
+                      <option value="+44">+44</option>
+                      <option value="+33">+33</option>
+                      <option value="+49">+49</option>
+                      <option value="+39">+39</option>
+                      <option value="+52">+52</option>
+                      <option value="+55">+55</option>
+                      <option value="+56">+56</option>
+                    </select>
+                    <input
+                      type="tel"
+                      required
+                      value={telefono}
+                      onChange={(e) => setTelefono(e.target.value)}
+                      className="flex-1 rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-[15px] text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+                      placeholder="300 123 4567"
+                      disabled={loading}
+                    />
+                  </div>
+                </label>
+                {error ? (
+                  <div className="rounded-lg bg-red-500/10 px-3 py-3 text-center text-sm text-red-100" role="alert">
+                    {error}
+                  </div>
+                ) : null}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:from-sky-400 hover:to-sky-500 disabled:opacity-55"
+                >
+                  {loading ? 'Enviando…' : 'Enviar código'}
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleClienteVerificar} className="mt-8 space-y-5">
+                <div className="rounded-lg bg-sky-500/10 px-3 py-2 text-center text-sm text-sky-200">
+                  Código enviado a {codigoPais}{telefono}
+                </div>
+                <label className="block text-left text-sm">
+                  <span className="mb-1.5 block font-medium text-slate-300">Código (6 dígitos)</span>
+                  <input
+                    type="text"
+                    placeholder="000000"
+                    maxLength={6}
+                    required
+                    value={codigo}
+                    onChange={(e) => setCodigo(e.target.value.replace(/\D/g, ''))}
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-center text-2xl font-bold letter-spacing-2 text-white placeholder:text-slate-500 focus:border-sky-500/50 focus:outline-none focus:ring-2 focus:ring-sky-500/25"
+                  />
+                </label>
+                {error ? (
+                  <div className="rounded-lg bg-red-500/10 px-3 py-3 text-center text-sm text-red-100" role="alert">
+                    {error}
+                  </div>
+                ) : null}
+                <button
+                  type="submit"
+                  disabled={loading || codigo.length !== 6}
+                  className="w-full rounded-xl bg-gradient-to-r from-sky-500 to-sky-600 py-3.5 text-[15px] font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:from-sky-400 hover:to-sky-500 disabled:opacity-55"
+                >
+                  {loading ? 'Verificando…' : 'Verificar y acceder'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCodigoEnviado(false)}
+                  className="w-full rounded-xl border border-white/10 py-3.5 text-[15px] font-semibold text-sky-400 transition hover:border-sky-500/50"
+                >
+                  Cambiar teléfono
+                </button>
+              </form>
+            )}
+          </>
+        )}
 
         <div className="mt-6 space-y-4 border-t border-white/[0.06] pt-6 text-center">
-          <Link
-            to="/recuperar"
-            className="text-sm font-medium text-sky-400 transition hover:text-sky-300"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
-          <p className="text-sm text-slate-500">
-            ¿No tienes cuenta?{' '}
-            <Link
-              to="/registro"
-              className="font-semibold text-sky-400 underline decoration-sky-400/40 underline-offset-2 hover:text-sky-300"
-            >
-              Registrarse
-            </Link>
-          </p>
+          {tipo === 'admin' ? (
+            <>
+              <Link
+                to="/recuperar"
+                className="text-sm font-medium text-sky-400 transition hover:text-sky-300"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+              <p className="text-sm text-slate-500">
+                ¿No tienes cuenta?{' '}
+                <Link
+                  to="/registro"
+                  className="font-semibold text-sky-400 underline decoration-sky-400/40 underline-offset-2 hover:text-sky-300"
+                >
+                  Registrarse
+                </Link>
+              </p>
+            </>
+          ) : (
+            <p className="text-sm text-slate-500">
+              ¿No tienes cuenta?{' '}
+              <Link
+                to="/registro"
+                className="font-semibold text-sky-400 underline decoration-sky-400/40 underline-offset-2 hover:text-sky-300"
+              >
+                Registrarse
+              </Link>
+            </p>
+          )}
         </div>
       </div>
 

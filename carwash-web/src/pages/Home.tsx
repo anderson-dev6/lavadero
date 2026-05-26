@@ -108,6 +108,107 @@ export function Home() {
             ))}
           </div>
         </section>
+
+        <section className="border-t border-slate-200/80 bg-[#fafbfc] py-16">
+          <div className="mx-auto max-w-5xl px-5 sm:px-8">
+            <div className="text-center">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700/90">
+                Nuestros servicios
+              </p>
+              <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                Elige el lavado perfecto para tu vehículo
+              </h2>
+              <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                Tres niveles de servicio pensados para diferentes necesidades y presupuestos.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs font-medium">
+                <span className="rounded-full bg-sky-100 px-3 py-1.5 text-sky-800">🚗 Carros</span>
+                <span className="rounded-full bg-sky-100 px-3 py-1.5 text-sky-800">🏍️ Motos</span>
+                <span className="rounded-full bg-sky-100 px-3 py-1.5 text-sky-800">🚙 Camionetas</span>
+              </div>
+            </div>
+
+            <div className="mt-10 grid gap-6 sm:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M3 12h18M3 6h18M3 18h12" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Básico</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  Lavado externo rápido. Ideal para mantener tu vehículo limpio en el día a día.
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Lavado de carrocería
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Llantas y rines
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Secado completo
+                  </li>
+                </ul>
+              </div>
+
+              <div className="relative rounded-2xl border-2 border-sky-500 bg-white p-6 shadow-md">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-sky-500 px-3 py-1 text-xs font-semibold text-white">
+                  Más popular
+                </span>
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500 text-white">
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Completo</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  Lavado externo e interno. Tu vehículo queda impecable por dentro y por fuera.
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Todo lo del Básico
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Aspirado interior
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Limpieza de tablero
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Vidrios por dentro
+                  </li>
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
+                  <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" strokeLinejoin="round" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-slate-900">Detallado</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  Servicio premium. Cera, brillo y atención a cada detalle de tu vehículo.
+                </p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Todo lo del Completo
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Cera y brillo
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Tratamiento de cuero
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="mt-0.5 text-emerald-600">✓</span> Motor (a petición)
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <footer className="border-t border-slate-200/80 bg-white py-8 text-center">

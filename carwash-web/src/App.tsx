@@ -14,6 +14,8 @@ import { ClienteAgendar } from './pages/cliente/ClienteAgendar'
 import { ClienteHistorial } from './pages/cliente/ClienteHistorial'
 import { ClienteInicio } from './pages/cliente/ClienteInicio'
 import { ClienteReservas } from './pages/cliente/ClienteReservas'
+import { ClienteLoginTelefono } from './pages/cliente/ClienteLoginTelefono'
+import { ClienteVerificarCodigo } from './pages/cliente/ClienteVerificarCodigo'
 import { EmpleadoServicios } from './pages/empleado/EmpleadoServicios'
 import { Home } from './pages/Home'
 import { Login } from './pages/Login'
@@ -28,6 +30,8 @@ export default function App() {
       <Route path="/registro" element={<Register />} />
       <Route path="/recuperar" element={<RecuperarContrasena />} />
       <Route path="/panel" element={<PanelRedirect />} />
+      <Route path="/cliente/login-telefono" element={<ClienteLoginTelefono />} />
+      <Route path="/cliente/verificar-codigo" element={<ClienteVerificarCodigo />} />
 
       <Route
         path="/admin"
