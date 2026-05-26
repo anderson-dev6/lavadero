@@ -9,7 +9,6 @@ export function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname
-  const registered = (location.state as { registered?: boolean })?.registered
 
   const [tipo, setTipo] = useState<'admin' | 'cliente'>('admin')
 
