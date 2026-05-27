@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useServicios } from '../../context/ServiciosContext'
 import { hoyISO } from '../../lib/dates'
 import {
+  deleteEmpleado,
   fetchEmpleados,
   insertEmpleado,
   setEmpleadoActivo,
@@ -51,6 +52,12 @@ export function AdminEmpleados() {
     if (ok) await reload()
   }
 
+  async function eliminar(emp: EmpleadoRow) {
+    if (!confirm(`¿Eliminar a ${emp.nombre}?`)) return
+    const ok = await deleteEmpleado(emp.id)
+    if (ok) await reload()
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -95,17 +102,26 @@ export function AdminEmpleados() {
                 Completados hoy: {stats.get(emp.nombre) ?? 0}
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => void toggleActivo(emp)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
-                emp.activo
-                  ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                  : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
-              }`}
-            >
-              {emp.activo ? 'Activo' : 'Inactivo'}
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => void toggleActivo(emp)}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
+                  emp.activo
+                    ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                    : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
+                }`}
+              >
+                {emp.activo ? 'Activo' : 'Inactivo'}
+              </button>
+              <button
+                type="button"
+                onClick={() => void eliminar(emp)}
+                className="rounded-lg bg-red-100 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-200"
+              >
+                Eliminar
+              </button>
+            </div>
           </li>
         ))}
       </ul>

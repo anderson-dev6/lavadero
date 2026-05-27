@@ -47,3 +47,12 @@ export async function setEmpleadoActivo(
   }
   return true
 }
+
+export async function deleteEmpleado(id: string): Promise<boolean> {
+  const { error } = await supabase.from('empleados').delete().eq('id', id)
+  if (error) {
+    console.error(error)
+    return false
+  }
+  return true
+}
