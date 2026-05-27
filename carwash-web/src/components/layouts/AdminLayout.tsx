@@ -7,6 +7,7 @@ const nav = [
   { to: '/admin/servicios', label: 'Servicios' },
   { to: '/admin/reservas', label: 'Reservas' },
   { to: '/admin/finanzas', label: 'Finanzas' },
+  { to: '/admin/empleados', label: 'Empleados' },
   { to: '/admin/inventario', label: 'Inventario' },
 ]
 

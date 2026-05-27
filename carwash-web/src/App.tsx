@@ -5,6 +5,7 @@ import { AdminLayout } from './components/layouts/AdminLayout'
 import { ClienteLayout } from './components/layouts/ClienteLayout'
 import { EmpleadoLayout } from './components/layouts/EmpleadoLayout'
 import { AdminDashboard } from './pages/admin/AdminDashboard'
+import { AdminEmpleados } from './pages/admin/AdminEmpleados'
 import { AdminFinanzas } from './pages/admin/AdminFinanzas'
 import { AdminInventario } from './pages/admin/AdminInventario'
 import { AdminReservas } from './pages/admin/AdminReservas'
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="servicios" element={<AdminServicios />} />
         <Route path="reservas" element={<AdminReservas />} />
         <Route path="finanzas" element={<AdminFinanzas />} />
+        <Route path="empleados" element={<AdminEmpleados />} />
         <Route path="inventario" element={<AdminInventario />} />
       </Route>
 
